@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.sdu.ise.labs.dao.RangeMapper">
+    <resultMap id="BaseResultMap" type="cn.edu.sdu.ise.labs.model.Range">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="range_code" property="rangeCode" jdbcType="VARCHAR"/>
+        <result column="range_name" property="rangeName" jdbcType="VARCHAR"/>
+        <result column="range_location" property="rangeLocation" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="close_reason" property="closeReason" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="created_by" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="updated_by" property="updatedBy" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, range_code, range_name, range_location, status, close_reason, description, created_at,
+        updated_at, created_by, updated_by
+    </sql>
+    <!-- 批量删除 -->
+    <update id="deleteByCodes">
+        delete
+        from `range`
+        where range_code in
+        <foreach item="item" index="index" collection="rangeCodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <!-- 增加 -->
+    <insert id="insert" parameterType="cn.edu.sdu.ise.labs.model.Range">
+        insert into `range` (id, range_code, range_name,
+        range_location, status, close_reason,
+        description, created_at, updated_at,
+        created_by, updated_by)
+        values (#{id,jdbcType=INTEGER}, #{rangeCode,jdbcType=VARCHAR}, #{rangeName,jdbcType=VARCHAR},
+        #{rangeLocation,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{closeReason,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR})
+    </insert>
+    <!-- 更新 -->
+    <update id="updateByPrimaryKey" parameterType="cn.edu.sdu.ise.labs.model.Range">
+        update `range`
+        set range_code = #{rangeCode,jdbcType=VARCHAR},
+        range_name = #{rangeName,jdbcType=VARCHAR},
+        range_location = #{rangeLocation,jdbcType=VARCHAR},
+        status = #{status,jdbcType=INTEGER},
+        close_reason = #{closeReason,jdbcType=VARCHAR},
+        description = #{description,jdbcType=VARCHAR},
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+        created_by = #{createdBy,jdbcType=VARCHAR},
+        updated_by = #{updatedBy,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <!-- 查询 -->
+    <select id="get" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `range`
+        <where>
+            <if test="rangeCode!=null">
+                range_code like #{rangeCode}
+            </if>
+        </where>
+    </select>
+
+
+    <!-- 获取场地列表详情 -->
+    <select id="getByCode" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `range`
+        where
+        range_code=#{rangeCode}
+    </select>
+
+    <!-- 获取状态个数(分页) -->
+    <select id="countNum" resultType="integer">
+        select count(*)
+        from `range`
+        <where>
+            <if test="queryDTO.rangeName != null">
+                range_name like #{queryDTO.rangeName}
+            </if>
+            <if test="queryDTO.rangeLocation != null">
+                or range_location like #{queryDTO.rangeLocation}
+            </if>
+            <if test="queryDTO.rangeCode != null">
+                or range_code like #{queryDTO.rangeCode}
+            </if>
+            <if test="queryDTO.status != null">
+                or status =#{queryDTO.status}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据查询条件获取场地列表 （分页）-->
+    <select id="list" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `range`
+        <where>
+            <if test="queryDTO.rangeName != null">
+                range_name like #{queryDTO.rangeName}
+            </if>
+            <if test="queryDTO.rangeLocation != null">
+                or range_location like #{queryDTO.rangeLocation}
+            </if>
+            <if test="queryDTO.rangeCode != null">
+                or range_code like #{queryDTO.rangeCode}
+            </if>
+            <if test="queryDTO.status != null">
+                or status =#{queryDTO.status}
+            </if>
+        </where>
+        limit #{offset}, #{limit}
+    </select>
+
+</mapper>
